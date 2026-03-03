@@ -1,83 +1,80 @@
-import 'package:http/http.dart' as http;
-import 'package:news_app_api/models/article.dart';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:news_app_api/models/article.dart';
 import 'package:news_app_api/secret.dart';
 
 class News {
+  List<Article> news = [];
 
-  List<Article> news  = [];
+  Future<void> getNews() async {
+    final url = Uri.parse(
+      'https://newsapi.org/v2/top-headlines?country=in&excludeDomains=stackoverflow.com&sortBy=publishedAt&language=en&apiKey=$apiKey',
+    );
 
-  Future<void> getNews() async{
+    try {
+      final response = await http.get(url);
+      if (response.statusCode != 200) return;
 
-    String url = "http://newsapi.org/v2/top-headlines?country=in&excludeDomains=stackoverflow.com&sortBy=publishedAt&language=en&apiKey=${apiKey}";
+      final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
 
-    var response = await http.get(url);
-
-    var jsonData = jsonDecode(response.body);
-
-    if(jsonData['status'] == "ok"){
-      jsonData["articles"].forEach((element){
-
-        if(element['urlToImage'] != null && element['description'] != null){
-          Article article = Article(
-            title: element['title'],
-            author: element['author'],
-            description: element['description'],
-            urlToImage: element['urlToImage'],
-            publshedAt: DateTime.parse(element['publishedAt']),
-            content: element["content"],
-            articleUrl: element["url"],
-          );
-          news.add(article);
+      if (jsonData['status'] == 'ok') {
+        for (final element in jsonData['articles'] as List) {
+          if (element['urlToImage'] != null &&
+              element['description'] != null) {
+            final article = Article(
+              title: element['title'] as String?,
+              author: element['author'] as String?,
+              description: element['description'] as String?,
+              urlToImage: element['urlToImage'] as String?,
+              publshedAt: DateTime.parse(element['publishedAt'] as String),
+              content: element['content'] as String?,
+              articleUrl: element['url'] as String?,
+            );
+            news.add(article);
+          }
         }
-
-      });
+      }
+    } catch (e) {
+      debugPrint('Error fetching news: $e');
     }
-
-
   }
-
-
 }
-
 
 class NewsForCategorie {
+  List<Article> news = [];
 
-  List<Article> news  = [];
+  Future<void> getNewsForCategory(String category) async {
+    final url = Uri.parse(
+      'https://newsapi.org/v2/top-headlines?country=in&category=$category&apiKey=$apiKey',
+    );
 
-  Future<void> getNewsForCategory(String category) async{
+    try {
+      final response = await http.get(url);
+      if (response.statusCode != 200) return;
 
-    /*String url = "http://newsapi.org/v2/everything?q=$category&apiKey=${apiKey}";*/
-    String url = "http://newsapi.org/v2/top-headlines?country=in&category=$category&apiKey=${apiKey}";
+      final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
 
-    var response = await http.get(url);
-
-    var jsonData = jsonDecode(response.body);
-
-    if(jsonData['status'] == "ok"){
-      jsonData["articles"].forEach((element){
-
-        if(element['urlToImage'] != null && element['description'] != null){
-          Article article = Article(
-            title: element['title'],
-            author: element['author'],
-            description: element['description'],
-            urlToImage: element['urlToImage'],
-            publshedAt: DateTime.parse(element['publishedAt']),
-            content: element["content"],
-            articleUrl: element["url"],
-          );
-          news.add(article);
+      if (jsonData['status'] == 'ok') {
+        for (final element in jsonData['articles'] as List) {
+          if (element['urlToImage'] != null &&
+              element['description'] != null) {
+            final article = Article(
+              title: element['title'] as String?,
+              author: element['author'] as String?,
+              description: element['description'] as String?,
+              urlToImage: element['urlToImage'] as String?,
+              publshedAt: DateTime.parse(element['publishedAt'] as String),
+              content: element['content'] as String?,
+              articleUrl: element['url'] as String?,
+            );
+            news.add(article);
+          }
         }
-
-      });
+      }
+    } catch (e) {
+      debugPrint('Error fetching category news: $e');
     }
-
-
   }
-
-
 }
-
-
